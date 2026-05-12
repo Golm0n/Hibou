@@ -8,10 +8,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Nunito:wght@400;700;900&display=swap');
 
 :root {
-  --ok-color:     #a8e6a3;  --ok-glow:     #6fcf97;
-  --rare-color:   #56b4f5;  --rare-glow:   #2d9ef0;
-  --epic-color:   #c77dff;  --epic-glow:   #9b5de5;
-  --legend-color: #ffd700;  --legend-glow: #ff9500;
+  --ok-color:     #a8e6a3;
+  --rare-color:   #56b4f5;
+  --epic-color:   #c77dff;
+  --legend-color: #ffd700;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -21,21 +21,20 @@ body {
   font-family: 'Nunito', sans-serif;
   min-height: 100vh;
   display: flex; flex-direction: column; align-items: center;
-  overflow-x: hidden;
   color: #fff;
+  overflow-x: hidden;
 }
 
-/* ── ROULETTE STYLE CS ── */
+/* ── ROULETTE ── */
 .roulette-wrapper {
   position: relative;
   width: 100%;
-  height: 140px;
-  overflow: hidden;
-  margin: 1rem 0;
-  background: rgba(0,0,0,0.6);
+  height: 160px;
+  margin: 1.5rem 0;
+  background: rgba(0,0,0,0.8);
   border-top: 2px solid rgba(255,255,255,0.1);
   border-bottom: 2px solid rgba(255,255,255,0.1);
-  z-index: 10;
+  overflow: hidden;
 }
 
 .roulette-wrapper::after {
@@ -43,9 +42,9 @@ body {
   position: absolute;
   left: 50%; top: 0;
   width: 4px; height: 100%;
-  background: #ffd700;
-  z-index: 20;
-  box-shadow: 0 0 15px #ffd700;
+  background: #fff;
+  z-index: 50;
+  box-shadow: 0 0 15px #fff;
   transform: translateX(-50%);
 }
 
@@ -59,73 +58,78 @@ body {
 
 .roulette-item {
   width: 130px;
-  height: 110px;
+  height: 120px;
   margin: 0 5px;
   flex-shrink: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   background-size: cover;
   background-position: center;
-  border-bottom: 4px solid #555;
-  transition: filter 0.3s;
+  border-bottom: 6px solid #222;
+  transition: all 0.5s ease;
+  position: relative;
 }
 
-.roulette-item.ok     { border-color: var(--ok-color); }
-.roulette-item.rare   { border-color: var(--rare-color); }
-.roulette-item.epic   { border-color: var(--epic-color); }
-.roulette-item.legend { border-color: var(--legend-color); }
+/* ANTI-SPOIL : Cache l'image par un bloc de couleur vive flou */
+.roulette-track.spinning .roulette-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--item-color); /* Utilise la variable injectée en JS */
+  filter: blur(20px);
+  z-index: 8;
+  border-radius: 8px;
+}
+
+.roulette-item.ok { border-color: var(--ok-color); }
+.roulette-item.rare { border-color: var(--rare-color); }
+.roulette-item.epic { border-color: var(--epic-color); }
+.roulette-item.legendaire { border-color: var(--legend-color); }
+
+/* ÉTAT FINAL */
+.roulette-track.finished .roulette-item:not(.winner) {
+  opacity: 0.2;
+  filter: blur(5px) grayscale(1);
+  transform: scale(0.85);
+}
+
+.roulette-track.finished .roulette-item.winner {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1.15);
+  z-index: 10;
+  box-shadow: 0 0 40px var(--drop-glow);
+  border-color: var(--drop-glow);
+}
 
 /* ── ARENA ── */
-.arena {
-  position: relative;
-  width: min(480px, 90vw); height: min(480px, 90vw);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1; margin-top: 20px;
-}
+.arena { position: relative; width: 350px; height: 350px; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+.ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(255,255,255,0.05); transition: 0.6s; }
+.ring.ok { border-color: var(--ok-color); box-shadow: 0 0 30px var(--ok-color); }
+.ring.rare { border-color: var(--rare-color); box-shadow: 0 0 50px var(--rare-color); }
+.ring.epic { border-color: var(--epic-color); box-shadow: 0 0 70px var(--epic-color); }
+.ring.legendaire { border-color: var(--legend-color); box-shadow: 0 0 100px var(--legend-color); }
 
-.ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(255,255,255,.08); transition: all .4s; }
-.ring.ok     { border-color: var(--ok-color);     box-shadow: 0 0 30px var(--ok-glow); }
-.ring.rare   { border-color: var(--rare-color);   box-shadow: 0 0 50px var(--rare-glow); }
-.ring.epic   { border-color: var(--epic-color);   box-shadow: 0 0 70px var(--epic-glow); }
-.ring.legend { border-color: var(--legend-color); box-shadow: 0 0 100px var(--legend-glow); }
+.gif-frame { width: 85%; height: 85%; background: rgba(0,0,0,0.5); border-radius: 25px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.1); }
+.gif-frame img { max-width: 95%; max-height: 95%; display: none; border-radius: 15px; }
+.idle-owl { font-size: 6rem; }
 
-.gif-frame {
-  position: relative; z-index: 2;
-  width: 70%; height: 70%;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 20px; overflow: hidden;
-  background: rgba(0,0,0,.3);
-  border: 2px solid rgba(255,255,255,.1);
-}
+.btn-drop { font-family: 'Bungee'; padding: 1.2rem 3.5rem; font-size: 1.6rem; cursor: pointer; border-radius: 60px; background: linear-gradient(135deg, #ffd700, #ff6b35); border: none; margin: 20px; box-shadow: 0 5px 20px rgba(255,100,0,0.3); color: #200; }
+.btn-drop.rolling { filter: grayscale(1); pointer-events: none; opacity: 0.7; }
 
-.gif-frame img { max-width: 100%; max-height: 100%; object-fit: contain; display: none; }
-.idle-owl { font-size: 5rem; animation: idleBob 2s ease-in-out infinite; }
-
-@keyframes idleBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-/* Copie simplifiée de tes autres styles pour la concision */
-header h1 { font-family: 'Bungee Shade'; font-size: 3rem; color: gold; text-align: center; margin-top: 1rem; }
-.btn-drop { font-family: 'Bungee'; padding: 1rem 2rem; font-size: 1.5rem; cursor: pointer; border-radius: 50px; background: orange; border: none; margin: 20px; }
-.btn-drop.rolling { opacity: 0.5; pointer-events: none; }
-
-.rarity-badge { position: absolute; top: -10px; z-index: 5; padding: 5px 15px; border-radius: 20px; font-weight: 900; opacity: 0; transition: 0.3s; }
-.rarity-badge.visible { opacity: 1; }
+.rarity-badge { position: absolute; top: -15px; padding: 6px 22px; border-radius: 30px; font-family: 'Bungee'; opacity: 0; transition: 0.4s; color: #000; z-index: 10; font-size: 0.9rem; }
+.rarity-badge.visible { opacity: 1; transform: translateY(0); }
 
 .flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 100; }
-.flash.fire { animation: flashAnim 0.6s ease-out; }
+.flash.fire { animation: flashAnim 0.7s ease-out; }
 @keyframes flashAnim { 0% { opacity: 0.8; background: white; } 100% { opacity: 0; } }
-
-/* Utilise tes styles précédents pour le reste (particules, compteurs, etc.) */
-.rarity-counters { display: flex; gap: 1rem; margin: 10px; }
-.num { font-weight: bold; font-size: 1.2rem; }
 </style>
 </head>
 <body>
 
 <div class="flash" id="flash"></div>
 
-<header>
-  <h1>HIBOU GAMBLE</h1>
-  <p>Tire un hibou</p>
+<header style="text-align:center; padding-top:20px;">
+  <h1 style="font-family:'Bungee Shade'; font-size:3.5rem; background:linear-gradient(gold, orange); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">HIBOU GAMBLE</h1>
 </header>
 
 <div class="roulette-wrapper">
@@ -134,37 +138,32 @@ header h1 { font-family: 'Bungee Shade'; font-size: 3rem; color: gold; text-alig
 
 <div class="arena">
   <div class="ring" id="ring"></div>
-  <div class="gif-frame" id="gifFrame">
+  <div class="gif-frame">
     <div class="rarity-badge" id="rarityBadge"></div>
     <div class="idle-owl" id="idleOwl">🦉</div>
     <img id="gifImg" alt="Hibou"/>
   </div>
 </div>
 
-<div class="btn-zone">
-  <button class="btn-drop" id="btnDrop" onclick="rollDrop()">🎲 TIRER</button>
-</div>
+<button class="btn-drop" id="btnDrop" onclick="rollDrop()">🎲 TIRER</button>
 
-<div class="rarity-counters">
-  <div style="color:var(--ok-color)">OK: <span class="num" id="cntOk">0</span></div>
-  <div style="color:var(--rare-color)">RARE: <span class="num" id="cntRare">0</span></div>
-  <div style="color:var(--epic-color)">ÉPIQUE: <span class="num" id="cntEpic">0</span></div>
-  <div style="color:var(--legend-color)">LÉGENDAIRE: <span class="num" id="cntLegend">0</span></div>
+<div style="display:flex; gap:25px; font-weight:900; font-size:1.1rem; text-transform:uppercase;">
+  <div style="color:var(--ok-color)">OK: <span id="cntOk">0</span></div>
+  <div style="color:var(--rare-color)">RARE: <span id="cntRare">0</span></div>
+  <div style="color:var(--epic-color)">ÉPIQUE: <span id="cntEpic">0</span></div>
+  <div style="color:var(--legend-color)">LÉGENDAIRE: <span id="cntLegendaire">0</span></div>
 </div>
-
-<div id="statusMsg"></div>
 
 <script>
 const GITHUB_USER = 'Golm0n';
 const GITHUB_REPO = 'Hibou';
 const BRANCH      = 'main';
-
-const FOLDERS = ['ok', 'rare', 'epic', 'legendaire'];
+const FOLDERS     = ['ok', 'rare', 'epic', 'legendaire'];
 const CFG = {
-  ok:         { label: '✦ OK',            cls: 'ok',     color: '#a8e6a3' },
-  rare:       { label: '✦✦ RARE',         cls: 'rare',   color: '#56b4f5' },
-  epic:       { label: '✦✦✦ ÉPIQUE',      cls: 'epic',   color: '#c77dff' },
-  legendaire: { label: '✦✦✦✦ LÉGENDAIRE', cls: 'legend', color: '#ffd700' },
+  ok:         { label: '✦ OK', color: '#a8e6a3' },
+  rare:       { label: '✦✦ RARE', color: '#56b4f5' },
+  epic:       { label: '✦✦✦ ÉPIQUE', color: '#c77dff' },
+  legendaire: { label: '✦✦✦✦ LÉGENDAIRE', color: '#ffd700' },
 };
 
 let allGifs = [];
@@ -173,13 +172,13 @@ let isRolling = false;
 async function init() {
   const API = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/asset`;
   try {
-    const results = await Promise.all(FOLDERS.map(folder =>
-      fetch(`${API}/${folder}?ref=${BRANCH}`).then(r => r.json()).then(files => 
-        files.map(f => ({ folder, url: f.download_url, name: f.name }))
+    const res = await Promise.all(FOLDERS.map(f => 
+      fetch(`${API}/${f}?ref=${BRANCH}`).then(r => r.json()).then(data => 
+        data.filter(i => i.name.endsWith('.gif')).map(i => ({ folder: f, url: i.download_url }))
       )
     ));
-    allGifs = results.flat();
-  } catch(e) { console.error("Erreur API", e); }
+    allGifs = res.flat();
+  } catch(e) { console.error("Init Error", e); }
 }
 
 function rollDrop() {
@@ -188,64 +187,73 @@ function rollDrop() {
 
   const track = document.getElementById('rouletteTrack');
   const btn = document.getElementById('btnDrop');
+  const badge = document.getElementById('rarityBadge');
+  const img = document.getElementById('gifImg');
+  const idle = document.getElementById('idleOwl');
+
   btn.classList.add('rolling');
+  track.className = 'roulette-track spinning'; 
+  badge.classList.remove('visible');
+  img.style.display = 'none';
+  idle.style.display = 'block';
 
   const pick = allGifs[Math.floor(Math.random() * allGifs.length)];
-  const itemCount = 45; 
-  const itemWidth = 140; 
+  const itemCount = 50;
+  const itemWidth = 140;
+  const winningIndex = itemCount - 8;
 
   track.style.transition = 'none';
   track.style.transform = 'translateX(0)';
   track.innerHTML = '';
 
-  // Remplissage de la roulette
   for (let i = 0; i < itemCount; i++) {
-    const isFinal = (i === itemCount - 6);
-    const gif = isFinal ? pick : allGifs[Math.floor(Math.random() * allGifs.length)];
+    const isWin = (i === winningIndex);
+    const gif = isWin ? pick : allGifs[Math.floor(Math.random() * allGifs.length)];
     const div = document.createElement('div');
-    div.className = `roulette-item ${CFG[gif.folder].cls}`;
+    
+    // Injecte la couleur directement pour le pseudo-élément CSS
+    div.style.setProperty('--item-color', CFG[gif.folder].color);
     div.style.backgroundImage = `url(${gif.url})`;
+    div.className = `roulette-item ${gif.folder}`;
+    
+    if(isWin) div.id = "winnerItem";
     track.appendChild(div);
   }
 
-  // Animation
   setTimeout(() => {
-    track.style.transition = 'transform 4s cubic-bezier(0.15, 0, 0.15, 1)';
-    const targetOffset = (itemCount - 6) * itemWidth;
-    const centerOffset = (document.querySelector('.roulette-wrapper').offsetWidth / 2) - (itemWidth / 2);
-    track.style.transform = `translateX(-${targetOffset - centerOffset}px)`;
+    track.style.transition = 'transform 4.5s cubic-bezier(0.15, 0, 0.15, 1)';
+    const offset = (winningIndex * itemWidth) - (window.innerWidth / 2) + (itemWidth / 2);
+    track.style.transform = `translateX(-${offset}px)`;
   }, 50);
 
-  // Reveal
   setTimeout(() => {
-    const img = document.getElementById('gifImg');
-    const idle = document.getElementById('idleOwl');
-    const badge = document.getElementById('rarityBadge');
-    const ring = document.getElementById('ring');
+    track.classList.remove('spinning');
+    track.classList.add('finished');
+    
+    const winItem = document.getElementById('winnerItem');
     const cfg = CFG[pick.folder];
+    winItem.classList.add('winner');
+    winItem.style.setProperty('--drop-glow', cfg.color);
 
     idle.style.display = 'none';
     img.src = pick.url;
     img.style.display = 'block';
-    
     badge.textContent = cfg.label;
-    badge.className = `rarity-badge visible ${cfg.cls}`;
     badge.style.background = cfg.color;
-    ring.className = `ring ${cfg.cls}`;
+    badge.classList.add('visible');
+    document.getElementById('ring').className = `ring ${pick.folder}`;
 
-    // Flash écran
     const f = document.getElementById('flash');
     f.classList.add('fire');
-    setTimeout(() => f.classList.remove('fire'), 600);
+    setTimeout(() => f.classList.remove('fire'), 800);
+
+    const idCount = `cnt${pick.folder.charAt(0).toUpperCase() + pick.folder.slice(1)}`;
+    const el = document.getElementById(idCount);
+    if(el) el.textContent = parseInt(el.textContent) + 1;
 
     btn.classList.remove('rolling');
     isRolling = false;
-
-    // Mise à jour compteurs (simplifié)
-    const countEl = document.getElementById(`cnt${pick.folder.charAt(0).toUpperCase() + pick.folder.slice(1)}`);
-    if(countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
-
-  }, 4200);
+  }, 4700);
 }
 
 init();
