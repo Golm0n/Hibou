@@ -1,262 +1,350 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🦉 Hibou Gamble 🦉</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Nunito:wght@400;700;900&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🦉 Hibou Gamble 🦉</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Nunito:wght@400;700;900&display=swap');
 
-:root {
-  --ok-color:     #a8e6a3;
-  --rare-color:   #56b4f5;
-  --epic-color:   #c77dff;
-  --legend-color: #ffd700;
-}
+        :root {
+            --ok-color:     #a8e6a3;
+            --rare-color:   #56b4f5;
+            --epic-color:   #c77dff;
+            --legend-color: #ffd700;
+        }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
-  background: #0a0010;
-  font-family: 'Nunito', sans-serif;
-  min-height: 100vh;
-  display: flex; flex-direction: column; align-items: center;
-  color: #fff;
-  overflow-x: hidden;
-}
+        body {
+            background: #0a0010;
+            font-family: 'Nunito', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            color: #fff;
+            overflow: hidden;
+            padding-bottom: 2vh;
+        }
 
-/* ── ROULETTE ── */
-.roulette-wrapper {
-  position: relative;
-  width: 100%;
-  height: 160px;
-  margin: 1.5rem 0;
-  background: rgba(0,0,0,0.8);
-  border-top: 2px solid rgba(255,255,255,0.1);
-  border-bottom: 2px solid rgba(255,255,255,0.1);
-  overflow: hidden;
-}
+        header { padding-top: 2vh; text-align: center; flex-shrink: 0; }
+        header h1 {
+            font-family: 'Bungee Shade';
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            background: linear-gradient(gold, orange);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-.roulette-wrapper::after {
-  content: '';
-  position: absolute;
-  left: 50%; top: 0;
-  width: 4px; height: 100%;
-  background: #fff;
-  z-index: 50;
-  box-shadow: 0 0 15px #fff;
-  transform: translateX(-50%);
-}
+        /* ── ROULETTE ── */
+        .roulette-wrapper {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            background: rgba(0,0,0,0.8);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
 
-.roulette-track {
-  display: flex;
-  position: absolute;
-  left: 0; top: 0;
-  height: 100%;
-  align-items: center;
-}
+        .roulette-wrapper::after {
+            content: '';
+            position: absolute;
+            left: 50%; top: 0;
+            width: 4px; height: 100%;
+            background: #fff;
+            z-index: 50;
+            box-shadow: 0 0 15px #fff;
+            transform: translateX(-50%);
+        }
 
-.roulette-item {
-  width: 130px;
-  height: 120px;
-  margin: 0 5px;
-  flex-shrink: 0;
-  border-radius: 12px;
-  background-size: cover;
-  background-position: center;
-  border-bottom: 6px solid #222;
-  transition: all 0.5s ease;
-  position: relative;
-}
+        .roulette-track {
+            display: flex;
+            position: absolute;
+            left: 0; top: 0;
+            height: 100%;
+            align-items: center;
+        }
 
-/* ANTI-SPOIL : Cache l'image par un bloc de couleur vive flou */
-.roulette-track.spinning .roulette-item::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-color: var(--item-color); /* Utilise la variable injectée en JS */
-  filter: blur(20px);
-  z-index: 8;
-  border-radius: 8px;
-}
+        .roulette-item {
+            width: 110px;
+            height: 100px;
+            margin: 0 5px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            border-bottom: 4px solid #222;
+            transition: all 0.5s ease;
+            position: relative;
+        }
 
-.roulette-item.ok { border-color: var(--ok-color); }
-.roulette-item.rare { border-color: var(--rare-color); }
-.roulette-item.epic { border-color: var(--epic-color); }
-.roulette-item.legendaire { border-color: var(--legend-color); }
+        /* Effet de couleur floue pendant le spin */
+        .roulette-track.spinning .roulette-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: var(--item-color);
+            filter: blur(20px);
+            z-index: 8;
+            border-radius: 8px;
+        }
 
-/* ÉTAT FINAL */
-.roulette-track.finished .roulette-item:not(.winner) {
-  opacity: 0.2;
-  filter: blur(5px) grayscale(1);
-  transform: scale(0.85);
-}
+        .roulette-track.finished .roulette-item:not(.winner) {
+            opacity: 0.2;
+            filter: blur(5px) grayscale(1);
+            transform: scale(0.8);
+        }
 
-.roulette-track.finished .roulette-item.winner {
-  opacity: 1;
-  filter: blur(0);
-  transform: scale(1.15);
-  z-index: 10;
-  box-shadow: 0 0 40px var(--drop-glow);
-  border-color: var(--drop-glow);
-}
+        .roulette-track.finished .roulette-item.winner {
+            opacity: 1;
+            filter: blur(0);
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 0 30px var(--drop-glow);
+            border-color: var(--drop-glow);
+        }
 
-/* ── ARENA ── */
-.arena { position: relative; width: 350px; height: 350px; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
-.ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(255,255,255,0.05); transition: 0.6s; }
-.ring.ok { border-color: var(--ok-color); box-shadow: 0 0 30px var(--ok-color); }
-.ring.rare { border-color: var(--rare-color); box-shadow: 0 0 50px var(--rare-color); }
-.ring.epic { border-color: var(--epic-color); box-shadow: 0 0 70px var(--epic-color); }
-.ring.legendaire { border-color: var(--legend-color); box-shadow: 0 0 100px var(--legend-color); }
+        /* ── ARENA ── */
+        .arena {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-height: 50vh;
+        }
 
-.gif-frame { width: 85%; height: 85%; background: rgba(0,0,0,0.5); border-radius: 25px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.1); }
-.gif-frame img { max-width: 95%; max-height: 95%; display: none; border-radius: 15px; }
-.idle-owl { font-size: 6rem; }
+        .ring-container {
+            position: relative;
+            width: min(80vw, 400px);
+            height: min(80vw, 400px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.btn-drop { font-family: 'Bungee'; padding: 1.2rem 3.5rem; font-size: 1.6rem; cursor: pointer; border-radius: 60px; background: linear-gradient(135deg, #ffd700, #ff6b35); border: none; margin: 20px; box-shadow: 0 5px 20px rgba(255,100,0,0.3); color: #200; }
-.btn-drop.rolling { filter: grayscale(1); pointer-events: none; opacity: 0.7; }
+        .ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.05);
+            transition: 0.6s;
+        }
 
-.rarity-badge { position: absolute; top: -15px; padding: 6px 22px; border-radius: 30px; font-family: 'Bungee'; opacity: 0; transition: 0.4s; color: #000; z-index: 10; font-size: 0.9rem; }
-.rarity-badge.visible { opacity: 1; transform: translateY(0); }
+        .ring.ok { border-color: var(--ok-color); box-shadow: 0 0 30px var(--ok-color); }
+        .ring.rare { border-color: var(--rare-color); box-shadow: 0 0 50px var(--rare-color); }
+        .ring.epic { border-color: var(--epic-color); box-shadow: 0 0 70px var(--epic-color); }
+        .ring.legendaire { border-color: var(--legend-color); box-shadow: 0 0 100px var(--legend-color); }
 
-.flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 100; }
-.flash.fire { animation: flashAnim 0.7s ease-out; }
-@keyframes flashAnim { 0% { opacity: 0.8; background: white; } 100% { opacity: 0; } }
-</style>
+        .gif-frame {
+            width: 80%; height: 80%;
+            background: rgba(0,0,0,0.5);
+            border-radius: 25px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255,255,255,0.1);
+            z-index: 2;
+        }
+
+        .gif-frame img { max-width: 95%; max-height: 95%; display: none; border-radius: 15px; }
+        .idle-owl { font-size: clamp(3rem, 15vw, 6rem); }
+
+        /* ── CONTROLS ── */
+        .controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5vh;
+            flex-shrink: 0;
+        }
+
+        .btn-drop {
+            font-family: 'Bungee';
+            padding: 1rem 3rem;
+            font-size: 1.4rem;
+            cursor: pointer;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #ffd700, #ff6b35);
+            border: none;
+            box-shadow: 0 5px 20px rgba(255,100,0,0.3);
+            color: #200;
+            transition: 0.2s;
+        }
+
+        .btn-drop.rolling { opacity: 0.5; pointer-events: none; }
+
+        .rarity-counters {
+            display: flex;
+            gap: 15px;
+            font-weight: 900;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 20px;
+            border-radius: 20px;
+        }
+
+        .rarity-badge {
+            position: absolute;
+            top: -10px;
+            padding: 4px 18px;
+            border-radius: 30px;
+            font-family: 'Bungee';
+            opacity: 0;
+            transition: 0.4s;
+            color: #000;
+            z-index: 10;
+            font-size: 0.75rem;
+        }
+        .rarity-badge.visible { opacity: 1; }
+
+        .flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 100; }
+        .flash.fire { animation: flashAnim 0.7s ease-out; }
+        @keyframes flashAnim { 0% { opacity: 0.8; background: white; } 100% { opacity: 0; } }
+    </style>
 </head>
 <body>
 
 <div class="flash" id="flash"></div>
 
-<header style="text-align:center; padding-top:20px;">
-  <h1 style="font-family:'Bungee Shade'; font-size:3.5rem; background:linear-gradient(gold, orange); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">HIBOU GAMBLE</h1>
-</header>
+<header><h1>HIBOU GAMBLE</h1></header>
 
 <div class="roulette-wrapper">
-  <div class="roulette-track" id="rouletteTrack"></div>
+    <div class="roulette-track" id="rouletteTrack"></div>
 </div>
 
 <div class="arena">
-  <div class="ring" id="ring"></div>
-  <div class="gif-frame">
-    <div class="rarity-badge" id="rarityBadge"></div>
-    <div class="idle-owl" id="idleOwl">🦉</div>
-    <img id="gifImg" alt="Hibou"/>
-  </div>
+    <div class="ring-container">
+        <div class="ring" id="ring"></div>
+        <div class="gif-frame">
+            <div class="rarity-badge" id="rarityBadge"></div>
+            <div class="idle-owl" id="idleOwl">🦉</div>
+            <img id="gifImg" alt="Hibou"/>
+        </div>
+    </div>
 </div>
 
-<button class="btn-drop" id="btnDrop" onclick="rollDrop()">🎲 TIRER</button>
-
-<div style="display:flex; gap:25px; font-weight:900; font-size:1.1rem; text-transform:uppercase;">
-  <div style="color:var(--ok-color)">OK: <span id="cntOk">0</span></div>
-  <div style="color:var(--rare-color)">RARE: <span id="cntRare">0</span></div>
-  <div style="color:var(--epic-color)">ÉPIQUE: <span id="cntEpic">0</span></div>
-  <div style="color:var(--legend-color)">LÉGENDAIRE: <span id="cntLegendaire">0</span></div>
+<div class="controls">
+    <button class="btn-drop" id="btnDrop" onclick="rollDrop()">🎲 TIRER</button>
+    <div class="rarity-counters">
+        <div style="color:var(--ok-color)">OK: <span id="cntOk">0</span></div>
+        <div style="color:var(--rare-color)">RARE: <span id="cntRare">0</span></div>
+        <div style="color:var(--epic-color)">ÉP: <span id="cntEpic">0</span></div>
+        <div style="color:var(--legend-color)">LÉG: <span id="cntLegendaire">0</span></div>
+    </div>
 </div>
 
 <script>
-const GITHUB_USER = 'Golm0n';
-const GITHUB_REPO = 'Hibou';
-const BRANCH      = 'main';
-const FOLDERS     = ['ok', 'rare', 'epic', 'legendaire'];
-const CFG = {
-  ok:         { label: '✦ OK', color: '#a8e6a3' },
-  rare:       { label: '✦✦ RARE', color: '#56b4f5' },
-  epic:       { label: '✦✦✦ ÉPIQUE', color: '#c77dff' },
-  legendaire: { label: '✦✦✦✦ LÉGENDAIRE', color: '#ffd700' },
-};
+    // TES DONNÉES GÉNÉRÉES
+    const INVENTORY = {
+        "ok": ["bird-owl.gif","cope-coping.gif","cute-animals.gif","dancing-barn-owl.gif","eagle-nayaka.gif","entering-the-nest-tawny-owl.gif","falling-in-love-robert-e-fuller.gif","fat-bird-bird.gif","giphy (1).gif","giphy (2).gif","giphy.gif","grow-a-garden-grow-a-garden-update.gif","happy-anime.gif","head-turn-owls-have-superior-senses.gif","huh-owl.gif","humblewood-humblewood-owl.gif","i-am-not-happy-you-are-not-helping.gif","jaimeeandamber-nervous.gif","kissing-owls.gif","look-away-great-horned-owl-on-the-hunt.gif","morning.gif","nev-nevolent.gif","night-white.gif","observing-barn-owl.gif","owl-chick-stealth-walking-owl-chick-ninja-walk.gif","owl-chouette.gif","owl-face (1).gif","owl-face.gif","owl-hoot.gif","owl-in.gif","owl-no.gif","owl-owl-dance.gif","owl.gif","owls-owl.gif","shocked-mickey-mouse-funhouse.gif","sleeping-owl.gif","snoozing-barn-owl.gif","snowy-owl-white-owl.gif","staring-at-you-the-americas.gif","staring-great-horned-owl-on-the-hunt.gif","startled-barn-owl.gif","superbowl-football.gif","what-was-that-barn-owl.gif","wide-awake.gif","yawning-barn-owl-chick.gif"],
+        "rare": ["baby-owl-viralhog.gif","carrying-the-owls-robert-e-fuller.gif","cowl-cowls.gif","cute-owl-hug-cute-owl.gif","dont-touch-me-yukon-do-it.gif","fail-owl.gif","flying-owl-mickey-mouse-funhouse.gif","found-a-prey-barn-owl-chicks.gif","fuuka-fuuka-gaming.gif","goodnight-lucy-game-jam.gif","head-turn-mickey-mouse-funhouse.gif","let's-play-barn-owl.gif","little-owl-owl.gif","looking-around-barn-owl.gif","looking-down-hunting.gif","meowl-cat.gif","no-lol.gif","owl (1).gif","owl-bird.gif","owl-cat (1).gif","owl-cat.gif","owl-cork.gif","owl-cute.gif","owl-dance.gif","owl-eating.gif","owl-looking-up-looking-up.gif","owl-ping.gif","owl-stare.gif","owl-surprise.gif","owl-wink.gif","owl.gif","owl8134.gif","owls-toy-owl.gif","pain-owl.gif","pineapple-owl-pineappleowl.gif","pineowl-pineowl-meme.gif","poop-bible-saga-me-at-poop-museum.gif","robyn-schall-comic.gif","sleeping-robert-e-fuller.gif","snow-owl (1).gif","snow-owl.gif","snowy-owl-white-owl (1).gif","stare-what-was-that.gif","staring-tawny-owl.gif","wHOG1gx7.gif"],
+        "epic": ["animals-birds.gif","bathtime-owl.gif","birds-bird.gif","bounce-cat.gif","busy-right-now-cant-talk.gif","chouette-cute.gif","cockatoo-owl.gif","creepy-owl.gif","cute-owl-thumbs-up-owl-thumbs-up.gif","cute-owl.gif","dont-even-think-about-it-sorry-there-is-only-room-for-me.gif","eagle-owl-pet-owl.gif","flying-away-barn-owl.gif","funny-animals-owl.gif","getting-ready-mirror.gif","gun-nerf.gif","happy-birthday.gif","mail-delivery-owl.gif","nami-catt.gif","observing-barn-owl.gif","owl (1).gif","owl (2).gif","owl-bubo.gif","owl-hand.gif","owl-head-massage.gif","owl-hype.gif","owl-kitten.gif","owl-ooooo.gif","owl-relaxed.gif","owl-shower.gif","owl-snowy-owl.gif","owl-tired.gif","owl-travis.gif","owl.gif","run-owl.gif","sadowl.gif","shaking-my-head-tawny-owl.gif","stare.gif","strange-kid.gif","super-happy-smiling-owl-cute-feathered-friend.gif","take-that-bird-robert-e-fuller.gif","white-owl-langweilig.gif","yoll-eagle-owl-yoll (1).gif","yoll-eagle-owl-yoll.gif"],
+        "legendaire": ["brainrot-skibidi-toilet.gif","coruja-biriguijonson-coruja.gif","EtkBJc6B.gif","fabulous-owl.gif","llah7n.gif","meme.gif","owl (2).gif","owl-cute.gif","owl-gimme.gif","owl-mad.gif","owl-owl-hat.gif","owl-owl-in-sink.gif","owl-snowing.gif","owl-spin.gif","owl-spinwinnie.gif","owl123.gif","QAsvhwsu.gif","run-owl.gif","short-eared-owl-short-ear-owl.gif","smol-owl.gif"]
+    };
 
-let allGifs = [];
-let isRolling = false;
+    const CFG = {
+        ok:         { label: '✦ OK', color: '#a8e6a3' },
+        rare:       { label: '✦✦ RARE', color: '#56b4f5' },
+        epic:       { label: '✦✦✦ ÉPIQUE', color: '#c77dff' },
+        legendaire: { label: '✦✦✦✦ LÉGENDAIRE', color: '#ffd700' },
+    };
 
-async function init() {
-  const API = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/asset`;
-  try {
-    const res = await Promise.all(FOLDERS.map(f => 
-      fetch(`${API}/${f}?ref=${BRANCH}`).then(r => r.json()).then(data => 
-        data.filter(i => i.name.endsWith('.gif')).map(i => ({ folder: f, url: i.download_url }))
-      )
-    ));
-    allGifs = res.flat();
-  } catch(e) { console.error("Init Error", e); }
-}
+    let allGifs = [];
+    let isRolling = false;
 
-function rollDrop() {
-  if (isRolling || allGifs.length === 0) return;
-  isRolling = true;
+    function init() {
+        Object.keys(INVENTORY).forEach(folder => {
+            INVENTORY[folder].forEach(name => {
+                allGifs.push({ folder: folder, url: `asset/${folder}/${name}` });
+            });
+        });
+    }
 
-  const track = document.getElementById('rouletteTrack');
-  const btn = document.getElementById('btnDrop');
-  const badge = document.getElementById('rarityBadge');
-  const img = document.getElementById('gifImg');
-  const idle = document.getElementById('idleOwl');
+    function rollDrop() {
+        if (isRolling || allGifs.length === 0) return;
+        isRolling = true;
 
-  btn.classList.add('rolling');
-  track.className = 'roulette-track spinning'; 
-  badge.classList.remove('visible');
-  img.style.display = 'none';
-  idle.style.display = 'block';
+        const track = document.getElementById('rouletteTrack');
+        const btn = document.getElementById('btnDrop');
+        const badge = document.getElementById('rarityBadge');
+        const img = document.getElementById('gifImg');
+        const idle = document.getElementById('idleOwl');
+        const ring = document.getElementById('ring');
 
-  const pick = allGifs[Math.floor(Math.random() * allGifs.length)];
-  const itemCount = 50;
-  const itemWidth = 140;
-  const winningIndex = itemCount - 8;
+        btn.classList.add('rolling');
+        track.className = 'roulette-track spinning';
+        badge.classList.remove('visible');
+        img.style.display = 'none';
+        idle.style.display = 'block';
+        ring.className = 'ring';
 
-  track.style.transition = 'none';
-  track.style.transform = 'translateX(0)';
-  track.innerHTML = '';
+        const pick = allGifs[Math.floor(Math.random() * allGifs.length)];
+        const itemCount = 50;
+        const itemWidth = 120;
+        const winningIndex = itemCount - 8;
 
-  for (let i = 0; i < itemCount; i++) {
-    const isWin = (i === winningIndex);
-    const gif = isWin ? pick : allGifs[Math.floor(Math.random() * allGifs.length)];
-    const div = document.createElement('div');
-    
-    // Injecte la couleur directement pour le pseudo-élément CSS
-    div.style.setProperty('--item-color', CFG[gif.folder].color);
-    div.style.backgroundImage = `url(${gif.url})`;
-    div.className = `roulette-item ${gif.folder}`;
-    
-    if(isWin) div.id = "winnerItem";
-    track.appendChild(div);
-  }
+        track.style.transition = 'none';
+        track.style.transform = 'translateX(0)';
+        track.innerHTML = '';
 
-  setTimeout(() => {
-    track.style.transition = 'transform 4.5s cubic-bezier(0.15, 0, 0.15, 1)';
-    const offset = (winningIndex * itemWidth) - (window.innerWidth / 2) + (itemWidth / 2);
-    track.style.transform = `translateX(-${offset}px)`;
-  }, 50);
+        for (let i = 0; i < itemCount; i++) {
+            const isWin = (i === winningIndex);
+            const gif = isWin ? pick : allGifs[Math.floor(Math.random() * allGifs.length)];
+            const div = document.createElement('div');
+            div.style.setProperty('--item-color', CFG[gif.folder].color);
+            div.style.backgroundImage = `url(${gif.url})`;
+            div.className = `roulette-item ${gif.folder}`;
+            if(isWin) div.id = "winnerItem";
+            track.appendChild(div);
+        }
 
-  setTimeout(() => {
-    track.classList.remove('spinning');
-    track.classList.add('finished');
-    
-    const winItem = document.getElementById('winnerItem');
-    const cfg = CFG[pick.folder];
-    winItem.classList.add('winner');
-    winItem.style.setProperty('--drop-glow', cfg.color);
+        setTimeout(() => {
+            track.style.transition = 'transform 4.5s cubic-bezier(0.15, 0, 0.15, 1)';
+            const offset = (winningIndex * itemWidth) - (window.innerWidth / 2) + (itemWidth / 2);
+            track.style.transform = `translateX(-${offset}px)`;
+        }, 50);
 
-    idle.style.display = 'none';
-    img.src = pick.url;
-    img.style.display = 'block';
-    badge.textContent = cfg.label;
-    badge.style.background = cfg.color;
-    badge.classList.add('visible');
-    document.getElementById('ring').className = `ring ${pick.folder}`;
+        setTimeout(() => {
+            track.classList.remove('spinning');
+            track.classList.add('finished');
+            const winItem = document.getElementById('winnerItem');
+            const cfg = CFG[pick.folder];
+            winItem.classList.add('winner');
+            winItem.style.setProperty('--drop-glow', cfg.color);
 
-    const f = document.getElementById('flash');
-    f.classList.add('fire');
-    setTimeout(() => f.classList.remove('fire'), 800);
+            idle.style.display = 'none';
+            img.src = pick.url;
+            img.style.display = 'block';
+            badge.textContent = cfg.label;
+            badge.style.background = cfg.color;
+            badge.classList.add('visible');
+            ring.className = `ring ${pick.folder}`;
 
-    const idCount = `cnt${pick.folder.charAt(0).toUpperCase() + pick.folder.slice(1)}`;
-    const el = document.getElementById(idCount);
-    if(el) el.textContent = parseInt(el.textContent) + 1;
+            const f = document.getElementById('flash');
+            f.classList.add('fire');
+            setTimeout(() => f.classList.remove('fire'), 800);
 
-    btn.classList.remove('rolling');
-    isRolling = false;
-  }, 4700);
-}
+            // Mise à jour des compteurs
+            const idKey = `cnt${pick.folder.charAt(0).toUpperCase() + pick.folder.slice(1)}`;
+            const el = document.getElementById(idKey);
+            if(el) el.textContent = parseInt(el.textContent) + 1;
 
-init();
+            btn.classList.remove('rolling');
+            isRolling = false;
+        }, 4700);
+    }
+
+    init();
 </script>
 </body>
 </html>
