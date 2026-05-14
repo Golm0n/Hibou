@@ -14,337 +14,831 @@
             --legend-color: #ffd700;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
             background: #0a0010;
             font-family: 'Nunito', sans-serif;
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
             color: #fff;
-            overflow: hidden;
-            padding-bottom: 2vh;
         }
 
-        header { padding-top: 2vh; text-align: center; flex-shrink: 0; }
+        #app {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* NAV */
+        nav {
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 7px 12px;
+            background: rgba(0,0,0,0.75);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            z-index: 100;
+        }
+        .nav-btn {
+            font-family: 'Bungee';
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 2px solid rgba(255,255,255,0.15);
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.78rem;
+            transition: 0.18s;
+            white-space: nowrap;
+        }
+        .nav-btn.active, .nav-btn:hover {
+            background: linear-gradient(135deg, #ffd700, #ff6b35);
+            border-color: transparent;
+            color: #200;
+        }
+
+        /* VIEWS */
+        .view {
+            display: none;
+            flex: 1;
+            min-height: 0;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+        .view.active { display: flex; }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━
+           GACHA VIEW
+        ━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        #view-gacha { justify-content: space-between; padding-bottom: 8px; }
+
+        header {
+            flex-shrink: 0;
+            padding: 6px 0 2px;
+            text-align: center;
+        }
         header h1 {
             font-family: 'Bungee Shade';
-            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-size: clamp(1.5rem, 4.5vw, 2.8rem);
             background: linear-gradient(gold, orange);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            line-height: 1.1;
         }
 
-        /* ── ROULETTE ── */
         .roulette-wrapper {
+            flex-shrink: 0;
             position: relative;
             width: 100%;
-            height: 120px;
+            height: 105px;
             background: rgba(0,0,0,0.8);
             border-top: 1px solid rgba(255,255,255,0.1);
             border-bottom: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
-            flex-shrink: 0;
         }
-
         .roulette-wrapper::after {
             content: '';
-            position: absolute;
-            left: 50%; top: 0;
-            width: 4px; height: 100%;
-            background: #fff;
-            z-index: 50;
-            box-shadow: 0 0 15px #fff;
+            position: absolute; left: 50%; top: 0;
+            width: 3px; height: 100%;
+            background: #fff; z-index: 50;
+            box-shadow: 0 0 12px #fff;
             transform: translateX(-50%);
         }
-
         .roulette-track {
             display: flex;
-            position: absolute;
-            left: 0; top: 0;
-            height: 100%;
-            align-items: center;
+            position: absolute; left: 0; top: 0;
+            height: 100%; align-items: center;
         }
-
         .roulette-item {
-            width: 110px;
-            height: 100px;
-            margin: 0 5px;
-            flex-shrink: 0;
+            width: 95px; height: 85px;
+            margin: 0 5px; flex-shrink: 0;
             border-radius: 10px;
-            background-size: cover;
+            background-size: contain;
             background-position: center;
+            background-repeat: no-repeat;
+            background-color: #0d0010;
             border-bottom: 4px solid #222;
-            transition: all 0.5s ease;
             position: relative;
+            transition: opacity 0.4s, filter 0.4s, transform 0.4s;
         }
-
-        /* Effet de couleur floue pendant le spin */
         .roulette-track.spinning .roulette-item::before {
             content: '';
-            position: absolute;
-            inset: 0;
+            position: absolute; inset: 0;
             background-color: var(--item-color);
-            filter: blur(20px);
-            z-index: 8;
-            border-radius: 8px;
+            filter: blur(18px);
+            z-index: 8; border-radius: 8px;
         }
-
         .roulette-track.finished .roulette-item:not(.winner) {
-            opacity: 0.2;
-            filter: blur(5px) grayscale(1);
-            transform: scale(0.8);
+            opacity: 0.18;
+            filter: blur(4px) grayscale(1);
+            transform: scale(0.78);
         }
-
         .roulette-track.finished .roulette-item.winner {
-            opacity: 1;
-            filter: blur(0);
-            transform: scale(1.1);
+            opacity: 1; filter: none; transform: scale(1.12);
             z-index: 10;
-            box-shadow: 0 0 30px var(--drop-glow);
+            box-shadow: 0 0 28px var(--drop-glow);
             border-color: var(--drop-glow);
         }
 
-        /* ── ARENA ── */
         .arena {
-            position: relative;
-            flex-grow: 1;
+            flex: 1; min-height: 0;
             width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            max-height: 50vh;
+            display: flex; align-items: center; justify-content: center;
         }
-
         .ring-container {
             position: relative;
-            width: min(80vw, 400px);
-            height: min(80vw, 400px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: min(38vh, 52vw, 260px);
+            height: min(38vh, 52vw, 260px);
+            display: flex; align-items: center; justify-content: center;
         }
-
         .ring {
-            position: absolute;
-            inset: 0;
+            position: absolute; inset: 0;
             border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.05);
             transition: 0.6s;
         }
-
-        .ring.ok { border-color: var(--ok-color); box-shadow: 0 0 30px var(--ok-color); }
-        .ring.rare { border-color: var(--rare-color); box-shadow: 0 0 50px var(--rare-color); }
-        .ring.epic { border-color: var(--epic-color); box-shadow: 0 0 70px var(--epic-color); }
-        .ring.legendaire { border-color: var(--legend-color); box-shadow: 0 0 100px var(--legend-color); }
+        .ring.ok         { border-color: var(--ok-color);     box-shadow: 0 0 28px var(--ok-color); }
+        .ring.rare       { border-color: var(--rare-color);   box-shadow: 0 0 45px var(--rare-color); }
+        .ring.epic       { border-color: var(--epic-color);   box-shadow: 0 0 65px var(--epic-color); }
+        .ring.legendaire { border-color: var(--legend-color); box-shadow: 0 0 90px var(--legend-color); }
 
         .gif-frame {
-            width: 80%; height: 80%;
-            background: rgba(0,0,0,0.5);
-            border-radius: 25px;
+            width: 86%; height: 86%;
+            background: #060008;
+            border-radius: 18px;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             border: 2px solid rgba(255,255,255,0.1);
-            z-index: 2;
+            z-index: 2; position: relative;
         }
-
-        .gif-frame img { max-width: 95%; max-height: 95%; display: none; border-radius: 15px; }
-        .idle-owl { font-size: clamp(3rem, 15vw, 6rem); }
-
-        /* ── CONTROLS ── */
-        .controls {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5vh;
-            flex-shrink: 0;
+        .gif-frame img {
+            max-width: 100%; max-height: 100%;
+            width: 100%; height: 100%;
+            object-fit: contain;
+            display: none;
         }
-
-        .btn-drop {
-            font-family: 'Bungee';
-            padding: 1rem 3rem;
-            font-size: 1.4rem;
-            cursor: pointer;
-            border-radius: 50px;
-            background: linear-gradient(135deg, #ffd700, #ff6b35);
-            border: none;
-            box-shadow: 0 5px 20px rgba(255,100,0,0.3);
-            color: #200;
-            transition: 0.2s;
-        }
-
-        .btn-drop.rolling { opacity: 0.5; pointer-events: none; }
-
-        .rarity-counters {
-            display: flex;
-            gap: 15px;
-            font-weight: 900;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            background: rgba(255,255,255,0.05);
-            padding: 8px 20px;
-            border-radius: 20px;
-        }
+        .idle-owl { font-size: clamp(2.2rem, 9vw, 4.5rem); }
 
         .rarity-badge {
-            position: absolute;
-            top: -10px;
-            padding: 4px 18px;
-            border-radius: 30px;
-            font-family: 'Bungee';
-            opacity: 0;
-            transition: 0.4s;
-            color: #000;
-            z-index: 10;
-            font-size: 0.75rem;
+            position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+            padding: 3px 14px; border-radius: 30px;
+            font-family: 'Bungee'; opacity: 0; transition: 0.4s;
+            color: #000; z-index: 10; font-size: 0.68rem; white-space: nowrap;
         }
         .rarity-badge.visible { opacity: 1; }
 
-        .flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 100; }
-        .flash.fire { animation: flashAnim 0.7s ease-out; }
-        @keyframes flashAnim { 0% { opacity: 0.8; background: white; } 100% { opacity: 0; } }
+        .controls {
+            flex-shrink: 0;
+            width: 100%;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            padding: 0 12px;
+        }
+        .btn-drop {
+            font-family: 'Bungee';
+            padding: 0.65rem 2.2rem; font-size: 1.15rem;
+            cursor: pointer; border-radius: 50px;
+            background: linear-gradient(135deg, #ffd700, #ff6b35);
+            border: none; box-shadow: 0 4px 16px rgba(255,100,0,0.3);
+            color: #200; transition: 0.18s;
+        }
+        .btn-drop:hover:not(.rolling) { transform: scale(1.04); }
+        .btn-drop.rolling { opacity: 0.5; pointer-events: none; }
+
+        .rarity-counters {
+            display: flex; gap: 10px;
+            font-weight: 900; font-size: 0.72rem; text-transform: uppercase;
+            background: rgba(255,255,255,0.05);
+            padding: 5px 14px; border-radius: 20px;
+        }
+
+        .flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 999; }
+        .flash.fire { animation: flashAnim 0.7s ease-out forwards; }
+        @keyframes flashAnim { 0%{opacity:.7;background:#fff} 100%{opacity:0} }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━
+           RESULT POPUP
+        ━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .popup-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 500;
+            align-items: center; justify-content: center;
+            flex-direction: column; gap: 10px;
+            padding: 12px; overflow-y: auto;
+        }
+        .popup-overlay.show { display: flex; }
+
+        .swap-banner {
+            display: none;
+            background: linear-gradient(135deg, #ff6b35, #ffd700);
+            color: #200; font-family: 'Bungee'; font-size: 0.75rem;
+            padding: 9px 18px; border-radius: 12px;
+            text-align: center; max-width: 340px;
+        }
+        .swap-banner.show { display: block; }
+
+        .popup-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; flex-shrink: 0; }
+        .popup-btn {
+            font-family: 'Bungee'; padding: 8px 18px;
+            border-radius: 30px; border: 2px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.07); color: #fff;
+            cursor: pointer; font-size: 0.78rem; transition: 0.18s;
+        }
+        .popup-btn:hover { background: rgba(255,255,255,0.14); }
+        .popup-btn.primary {
+            background: linear-gradient(135deg,#ffd700,#ff6b35);
+            border-color: transparent; color: #200;
+        }
+
+        /* swap mini-grid */
+        #swapGrid {
+            display: none;
+            width: min(340px, 92vw);
+        }
+        .swap-grid-inner {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .swap-mini-card {
+            aspect-ratio: 1;
+            border-radius: 7px;
+            border: 2px solid var(--c);
+            background: #060008;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            position: relative;
+        }
+        .swap-mini-card:hover { transform: scale(1.1); box-shadow: 0 0 12px var(--c); }
+        .swap-mini-card img { max-width:100%; max-height:100%; object-fit:contain; }
+        .swap-dot {
+            position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+            width: 5px; height: 5px; border-radius: 50%;
+            background: var(--c);
+        }
+        .swap-hint {
+            text-align: center; font-size: 0.62rem;
+            color: rgba(255,255,255,0.32); margin-top: 4px;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━
+           INVENTORY VIEW
+        ━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        #view-inventory { padding: 8px 8px 5px; gap: 6px; }
+
+        .inv-header { flex-shrink: 0; text-align: center; }
+        .inv-header h2 {
+            font-family: 'Bungee'; font-size: 1.3rem;
+            background: linear-gradient(gold, orange);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .inv-slots-info { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 1px; }
+        .inv-hint       { font-size: 0.6rem;  color: rgba(255,255,255,0.2); }
+
+        /* 5×4 grid, fills remaining space, no scroll */
+        .inv-grid {
+            flex: 1; min-height: 0; width: 100%;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 5px;
+        }
+        @media (max-width: 440px) {
+            .inv-grid {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(5, 1fr);
+            }
+        }
+
+        /* mini card */
+        .owl-card {
+            position: relative;
+            border-radius: 9px; overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.17s, box-shadow 0.17s, opacity 0.17s;
+            background: #0b0014;
+            border: 2px solid var(--card-color, #333);
+            box-shadow: 0 0 7px color-mix(in srgb, var(--card-color, transparent) 40%, transparent);
+            display: flex; flex-direction: column;
+            min-height: 0;
+        }
+        .owl-card:hover:not(.empty) { transform: translateY(-3px) scale(1.05); }
+        .owl-card.dragging { opacity: 0.3; transform: scale(0.93); }
+        .owl-card.drag-over { outline: 2px dashed #ffd700; outline-offset: 2px; }
+
+        .owl-card.empty {
+            border: 2px dashed rgba(255,255,255,0.09);
+            box-shadow: none; cursor: default;
+            align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.015);
+        }
+        .owl-card.empty:hover { transform: none; }
+        .empty-icon { font-size: 1.1rem; color: rgba(255,255,255,0.1); }
+
+        .card-stripe { flex-shrink: 0; height: 3px; background: var(--card-color, #333); }
+
+        .card-img-wrap {
+            flex: 1; min-height: 0;
+            background: #060008;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; padding: 2px;
+        }
+        /* object-fit:contain = never cropped */
+        .card-img-wrap img {
+            max-width: 100%; max-height: 100%;
+            width: 100%; height: 100%;
+            object-fit: contain; display: block;
+        }
+
+        .card-footer {
+            flex-shrink: 0; padding: 2px 3px 3px;
+            background: rgba(0,0,0,0.88);
+        }
+        .card-name {
+            font-family: 'Bungee'; font-size: 0.42rem;
+            color: rgba(255,255,255,0.55);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            margin-bottom: 1px;
+        }
+        .mini-bars { display: flex; flex-direction: column; gap: 1px; }
+        .mini-bar-track { height: 2px; background: rgba(255,255,255,0.07); border-radius: 1px; overflow: hidden; }
+        .mini-bar-fill  { height: 100%; border-radius: 1px; background: var(--card-color,#fff); width: var(--w); }
+
+        .card-del-btn {
+            position: absolute; top: 3px; right: 3px;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: rgba(200,0,0,0.85); border: none;
+            color: #fff; font-size: 0.55rem; cursor: pointer;
+            display: none; align-items: center; justify-content: center;
+            z-index: 5; line-height: 1;
+        }
+        .owl-card:hover .card-del-btn { display: flex; }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━
+           FULL CARD MODAL
+        ━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.88); z-index: 600;
+            align-items: center; justify-content: center; padding: 14px;
+        }
+        .modal-overlay.show { display: flex; }
+
+        .full-card {
+            position: relative;
+            width: min(290px, 86vw); max-height: 88vh;
+            border-radius: 16px; overflow: hidden;
+            border: 3px solid var(--card-color, #555);
+            box-shadow: 0 0 48px color-mix(in srgb, var(--card-color,transparent) 55%, transparent),
+                        0 18px 48px rgba(0,0,0,0.8);
+            background: #0d0d1a;
+            animation: cardPop 0.26s ease-out;
+            display: flex; flex-direction: column;
+        }
+        @keyframes cardPop { from{transform:scale(0.82);opacity:0} to{transform:scale(1);opacity:1} }
+
+        .fc-header {
+            flex-shrink: 0; padding: 10px 12px 7px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .fc-rarity { font-family:'Bungee'; font-size:0.58rem; padding:2px 9px; border-radius:20px; background:var(--card-color); color:#000; }
+        .modal-close { background:rgba(255,255,255,0.1); border:none; color:#fff; width:24px; height:24px; border-radius:50%; cursor:pointer; font-size:0.78rem; display:flex; align-items:center; justify-content:center; }
+
+        .fc-img { flex-shrink:0; width:100%; height:150px; background:#060008; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+        .fc-img img { max-width:100%; max-height:100%; object-fit:contain; }
+
+        .fc-body { flex:1; overflow-y:auto; padding:10px 12px 12px; }
+        .fc-name { font-family:'Bungee'; font-size:0.8rem; color:var(--card-color); text-align:center; margin-bottom:8px; }
+
+        .stats-list { display:flex; flex-direction:column; gap:5px; }
+        .stat-row   { display:flex; align-items:center; gap:6px; }
+        .stat-icon  { width:18px; text-align:center; font-size:0.8rem; flex-shrink:0; }
+        .stat-label { font-family:'Bungee'; font-size:0.54rem; color:rgba(255,255,255,0.4); width:66px; flex-shrink:0; }
+        .stat-bar-wrap { flex:1; height:6px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; }
+        .stat-bar-fill { height:100%; border-radius:3px; background:var(--card-color); width:0; transition:width 0.65s ease-out; }
+        .stat-value { font-family:'Bungee'; font-size:0.66rem; width:22px; text-align:right; flex-shrink:0; }
+
+        .power-total { margin-top:8px; padding:7px; border-radius:7px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); text-align:center; }
+        .power-label { font-size:0.55rem; color:rgba(255,255,255,0.32); letter-spacing:2px; text-transform:uppercase; }
+        .power-value { font-family:'Bungee'; font-size:1.3rem; color:var(--card-color); }
+
+        .fc-del-btn { margin-top:8px; width:100%; padding:6px; border-radius:7px; background:rgba(255,50,50,0.1); border:1px solid rgba(255,50,50,0.22); color:#ff7070; cursor:pointer; font-family:'Bungee'; font-size:0.65rem; }
+
+        /* TOASTS */
+        .toast-container { position:fixed; bottom:14px; left:50%; transform:translateX(-50%); z-index:900; display:flex; flex-direction:column; align-items:center; gap:5px; pointer-events:none; }
+        .toast { background:rgba(18,18,28,0.97); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:7px 18px; border-radius:30px; font-size:0.78rem; font-weight:700; animation:toastIn 0.24s ease, toastOut 0.28s ease 2.4s forwards; pointer-events:none; white-space:nowrap; }
+        @keyframes toastIn  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes toastOut { from{opacity:1} to{opacity:0} }
     </style>
 </head>
 <body>
+<div id="app">
 
 <div class="flash" id="flash"></div>
+<div class="toast-container" id="toastContainer"></div>
 
-<header><h1>HIBOU GAMBLE</h1></header>
+<!-- NAV -->
+<nav>
+    <button class="nav-btn active" onclick="switchView('gacha',this)">🎲 GACHA</button>
+    <button class="nav-btn"        onclick="switchView('inventory',this)">📦 INVENTAIRE <span id="invCount">0/20</span></button>
+</nav>
 
-<div class="roulette-wrapper">
-    <div class="roulette-track" id="rouletteTrack"></div>
-</div>
+<!-- ═══ GACHA ═══ -->
+<div class="view active" id="view-gacha">
+    <header><h1>HIBOU GAMBLE</h1></header>
 
-<div class="arena">
-    <div class="ring-container">
-        <div class="ring" id="ring"></div>
-        <div class="gif-frame">
-            <div class="rarity-badge" id="rarityBadge"></div>
-            <div class="idle-owl" id="idleOwl">🦉</div>
-            <img id="gifImg" alt="Hibou"/>
+    <div class="roulette-wrapper">
+        <div class="roulette-track" id="rouletteTrack"></div>
+    </div>
+
+    <div class="arena">
+        <div class="ring-container">
+            <div class="ring" id="ring"></div>
+            <div class="gif-frame">
+                <div class="rarity-badge" id="rarityBadge"></div>
+                <div class="idle-owl" id="idleOwl">🦉</div>
+                <img id="gifImg" alt="Hibou"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-drop" id="btnDrop" onclick="rollDrop()">🎲 TIRER</button>
+        <div class="rarity-counters">
+            <span style="color:var(--ok-color)">OK <span id="cntOk">0</span></span>
+            <span style="color:var(--rare-color)">RARE <span id="cntRare">0</span></span>
+            <span style="color:var(--epic-color)">ÉP <span id="cntEpic">0</span></span>
+            <span style="color:var(--legend-color)">LÉG <span id="cntLegendaire">0</span></span>
         </div>
     </div>
 </div>
 
-<div class="controls">
-    <button class="btn-drop" id="btnDrop" onclick="rollDrop()">🎲 TIRER</button>
-    <div class="rarity-counters">
-        <div style="color:var(--ok-color)">OK: <span id="cntOk">0</span></div>
-        <div style="color:var(--rare-color)">RARE: <span id="cntRare">0</span></div>
-        <div style="color:var(--epic-color)">ÉP: <span id="cntEpic">0</span></div>
-        <div style="color:var(--legend-color)">LÉG: <span id="cntLegendaire">0</span></div>
+<!-- ═══ INVENTORY ═══ -->
+<div class="view" id="view-inventory">
+    <div class="inv-header">
+        <h2>🪶 MES HIBOUX</h2>
+        <div class="inv-slots-info" id="slotsInfo">0 / 20 slots</div>
+        <div class="inv-hint">Glisse pour réorganiser · Clique pour voir la carte</div>
+    </div>
+    <div class="inv-grid" id="invGrid"></div>
+</div>
+
+</div><!-- #app -->
+
+<!-- RESULT POPUP -->
+<div class="popup-overlay" id="resultPopup">
+    <div id="resultCardSlot"></div>
+    <div class="swap-banner" id="swapBanner">📦 Inventaire plein !<br>Choisis un hibou à libérer ↓</div>
+    <div class="popup-actions">
+        <button class="popup-btn primary" id="btnAddInv" onclick="addToInventory()">📦 Garder</button>
+        <button class="popup-btn"         onclick="closeResultPopup()">✕ Ignorer</button>
+    </div>
+    <div id="swapGrid">
+        <div class="swap-grid-inner" id="swapGridInner"></div>
+        <div class="swap-hint">Clique sur le hibou à remplacer</div>
     </div>
 </div>
 
+<!-- CARD MODAL -->
+<div class="modal-overlay" id="cardModal" onclick="closeModalOutside(event)">
+    <div class="full-card" id="fullCard"></div>
+</div>
+
 <script>
-    // TES DONNÉES GÉNÉRÉES
-    const INVENTORY = {
-        "ok": ["bird-owl.gif","cope-coping.gif","cute-animals.gif","dancing-barn-owl.gif","eagle-nayaka.gif","entering-the-nest-tawny-owl.gif","falling-in-love-robert-e-fuller.gif","fat-bird-bird.gif","giphy (1).gif","giphy (2).gif","giphy.gif","grow-a-garden-grow-a-garden-update.gif","happy-anime.gif","head-turn-owls-have-superior-senses.gif","huh-owl.gif","humblewood-humblewood-owl.gif","i-am-not-happy-you-are-not-helping.gif","jaimeeandamber-nervous.gif","kissing-owls.gif","look-away-great-horned-owl-on-the-hunt.gif","morning.gif","nev-nevolent.gif","night-white.gif","observing-barn-owl.gif","owl-chick-stealth-walking-owl-chick-ninja-walk.gif","owl-chouette.gif","owl-face (1).gif","owl-face.gif","owl-hoot.gif","owl-in.gif","owl-no.gif","owl-owl-dance.gif","owl.gif","owls-owl.gif","shocked-mickey-mouse-funhouse.gif","sleeping-owl.gif","snoozing-barn-owl.gif","snowy-owl-white-owl.gif","staring-at-you-the-americas.gif","staring-great-horned-owl-on-the-hunt.gif","startled-barn-owl.gif","superbowl-football.gif","what-was-that-barn-owl.gif","wide-awake.gif","yawning-barn-owl-chick.gif"],
-        "rare": ["baby-owl-viralhog.gif","carrying-the-owls-robert-e-fuller.gif","cowl-cowls.gif","cute-owl-hug-cute-owl.gif","dont-touch-me-yukon-do-it.gif","fail-owl.gif","flying-owl-mickey-mouse-funhouse.gif","found-a-prey-barn-owl-chicks.gif","fuuka-fuuka-gaming.gif","goodnight-lucy-game-jam.gif","head-turn-mickey-mouse-funhouse.gif","let's-play-barn-owl.gif","little-owl-owl.gif","looking-around-barn-owl.gif","looking-down-hunting.gif","meowl-cat.gif","no-lol.gif","owl (1).gif","owl-bird.gif","owl-cat (1).gif","owl-cat.gif","owl-cork.gif","owl-cute.gif","owl-dance.gif","owl-eating.gif","owl-looking-up-looking-up.gif","owl-ping.gif","owl-stare.gif","owl-surprise.gif","owl-wink.gif","owl.gif","owl8134.gif","owls-toy-owl.gif","pain-owl.gif","pineapple-owl-pineappleowl.gif","pineowl-pineowl-meme.gif","poop-bible-saga-me-at-poop-museum.gif","robyn-schall-comic.gif","sleeping-robert-e-fuller.gif","snow-owl (1).gif","snow-owl.gif","snowy-owl-white-owl (1).gif","stare-what-was-that.gif","staring-tawny-owl.gif","wHOG1gx7.gif"],
-        "epic": ["animals-birds.gif","bathtime-owl.gif","birds-bird.gif","bounce-cat.gif","busy-right-now-cant-talk.gif","chouette-cute.gif","cockatoo-owl.gif","creepy-owl.gif","cute-owl-thumbs-up-owl-thumbs-up.gif","cute-owl.gif","dont-even-think-about-it-sorry-there-is-only-room-for-me.gif","eagle-owl-pet-owl.gif","flying-away-barn-owl.gif","funny-animals-owl.gif","getting-ready-mirror.gif","gun-nerf.gif","happy-birthday.gif","mail-delivery-owl.gif","nami-catt.gif","observing-barn-owl.gif","owl (1).gif","owl (2).gif","owl-bubo.gif","owl-hand.gif","owl-head-massage.gif","owl-hype.gif","owl-kitten.gif","owl-ooooo.gif","owl-relaxed.gif","owl-shower.gif","owl-snowy-owl.gif","owl-tired.gif","owl-travis.gif","owl.gif","run-owl.gif","sadowl.gif","shaking-my-head-tawny-owl.gif","stare.gif","strange-kid.gif","super-happy-smiling-owl-cute-feathered-friend.gif","take-that-bird-robert-e-fuller.gif","white-owl-langweilig.gif","yoll-eagle-owl-yoll (1).gif","yoll-eagle-owl-yoll.gif"],
-        "legendaire": ["brainrot-skibidi-toilet.gif","coruja-biriguijonson-coruja.gif","EtkBJc6B.gif","fabulous-owl.gif","llah7n.gif","meme.gif","owl (2).gif","owl-cute.gif","owl-gimme.gif","owl-mad.gif","owl-owl-hat.gif","owl-owl-in-sink.gif","owl-snowing.gif","owl-spin.gif","owl-spinwinnie.gif","owl123.gif","QAsvhwsu.gif","run-owl.gif","short-eared-owl-short-ear-owl.gif","smol-owl.gif"]
-    };
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DATA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const POOL = {
+    ok:["bird-owl.gif","cope-coping.gif","cute-animals.gif","dancing-barn-owl.gif","eagle-nayaka.gif","entering-the-nest-tawny-owl.gif","falling-in-love-robert-e-fuller.gif","fat-bird-bird.gif","giphy (1).gif","giphy (2).gif","giphy.gif","grow-a-garden-grow-a-garden-update.gif","happy-anime.gif","head-turn-owls-have-superior-senses.gif","huh-owl.gif","humblewood-humblewood-owl.gif","i-am-not-happy-you-are-not-helping.gif","jaimeeandamber-nervous.gif","kissing-owls.gif","look-away-great-horned-owl-on-the-hunt.gif","morning.gif","nev-nevolent.gif","night-white.gif","observing-barn-owl.gif","owl-chick-stealth-walking-owl-chick-ninja-walk.gif","owl-chouette.gif","owl-face (1).gif","owl-face.gif","owl-hoot.gif","owl-in.gif","owl-no.gif","owl-owl-dance.gif","owl.gif","owls-owl.gif","shocked-mickey-mouse-funhouse.gif","sleeping-owl.gif","snoozing-barn-owl.gif","snowy-owl-white-owl.gif","staring-at-you-the-americas.gif","staring-great-horned-owl-on-the-hunt.gif","startled-barn-owl.gif","superbowl-football.gif","what-was-that-barn-owl.gif","wide-awake.gif","yawning-barn-owl-chick.gif"],
+    rare:["baby-owl-viralhog.gif","carrying-the-owls-robert-e-fuller.gif","cowl-cowls.gif","cute-owl-hug-cute-owl.gif","dont-touch-me-yukon-do-it.gif","fail-owl.gif","flying-owl-mickey-mouse-funhouse.gif","found-a-prey-barn-owl-chicks.gif","fuuka-fuuka-gaming.gif","goodnight-lucy-game-jam.gif","head-turn-mickey-mouse-funhouse.gif","let's-play-barn-owl.gif","little-owl-owl.gif","looking-around-barn-owl.gif","looking-down-hunting.gif","meowl-cat.gif","no-lol.gif","owl (1).gif","owl-bird.gif","owl-cat (1).gif","owl-cat.gif","owl-cork.gif","owl-cute.gif","owl-dance.gif","owl-eating.gif","owl-looking-up-looking-up.gif","owl-ping.gif","owl-stare.gif","owl-surprise.gif","owl-wink.gif","owl.gif","owl8134.gif","owls-toy-owl.gif","pain-owl.gif","pineapple-owl-pineappleowl.gif","pineowl-pineowl-meme.gif","poop-bible-saga-me-at-poop-museum.gif","robyn-schall-comic.gif","sleeping-robert-e-fuller.gif","snow-owl (1).gif","snow-owl.gif","snowy-owl-white-owl (1).gif","stare-what-was-that.gif","staring-tawny-owl.gif","wHOG1gx7.gif"],
+    epic:["animals-birds.gif","bathtime-owl.gif","birds-bird.gif","bounce-cat.gif","busy-right-now-cant-talk.gif","chouette-cute.gif","cockatoo-owl.gif","creepy-owl.gif","cute-owl-thumbs-up-owl-thumbs-up.gif","cute-owl.gif","dont-even-think-about-it-sorry-there-is-only-room-for-me.gif","eagle-owl-pet-owl.gif","flying-away-barn-owl.gif","funny-animals-owl.gif","getting-ready-mirror.gif","gun-nerf.gif","happy-birthday.gif","mail-delivery-owl.gif","nami-catt.gif","observing-barn-owl.gif","owl (1).gif","owl (2).gif","owl-bubo.gif","owl-hand.gif","owl-head-massage.gif","owl-hype.gif","owl-kitten.gif","owl-ooooo.gif","owl-relaxed.gif","owl-shower.gif","owl-snowy-owl.gif","owl-tired.gif","owl-travis.gif","owl.gif","run-owl.gif","sadowl.gif","shaking-my-head-tawny-owl.gif","stare.gif","strange-kid.gif","super-happy-smiling-owl-cute-feathered-friend.gif","take-that-bird-robert-e-fuller.gif","white-owl-langweilig.gif","yoll-eagle-owl-yoll (1).gif","yoll-eagle-owl-yoll.gif"],
+    legendaire:["brainrot-skibidi-toilet.gif","coruja-biriguijonson-coruja.gif","EtkBJc6B.gif","fabulous-owl.gif","llah7n.gif","meme.gif","owl (2).gif","owl-cute.gif","owl-gimme.gif","owl-mad.gif","owl-owl-hat.gif","owl-owl-in-sink.gif","owl-snowing.gif","owl-spin.gif","owl-spinwinnie.gif","owl123.gif","QAsvhwsu.gif","run-owl.gif","short-eared-owl-short-ear-owl.gif","smol-owl.gif"]
+};
+const CFG = {
+    ok:         {label:'✦ OK',             color:'#a8e6a3', stars:1},
+    rare:       {label:'✦✦ RARE',          color:'#56b4f5', stars:2},
+    epic:       {label:'✦✦✦ ÉPIQUE',       color:'#c77dff', stars:3},
+    legendaire: {label:'✦✦✦✦ LÉGENDAIRE', color:'#ffd700', stars:4},
+};
+const STAT_RANGES = {ok:[10,40],rare:[30,60],epic:[50,80],legendaire:[70,99]};
+const STATS = [
+    {key:'atk',label:'ATTAQUE',  icon:'⚔️'},
+    {key:'def',label:'DÉFENSE',  icon:'🛡️'},
+    {key:'end',label:'ENDURANCE',icon:'❤️'},
+    {key:'vit',label:'VITESSE',  icon:'💨'},
+    {key:'sag',label:'SAGESSE',  icon:'🦉'},
+    {key:'mys',label:'MYSTÈRE',  icon:'🔮'},
+];
+const MAX=20, CKEY='hibouGamble_v3';
 
-    const CFG = {
-        ok:         { label: '✦ OK', color: '#a8e6a3' },
-        rare:       { label: '✦✦ RARE', color: '#56b4f5' },
-        epic:       { label: '✦✦✦ ÉPIQUE', color: '#c77dff' },
-        legendaire: { label: '✦✦✦✦ LÉGENDAIRE', color: '#ffd700' },
-    };
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+let allGifs=[], isRolling=false, inventory=[], counters={ok:0,rare:0,epic:0,legendaire:0}, pending=null;
+let dragSrc=null;
 
-    let allGifs = [];
-    let isRolling = false;
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   COOKIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function save(){const d=new Date();d.setFullYear(d.getFullYear()+2);document.cookie=`${CKEY}=${encodeURIComponent(JSON.stringify({inventory,counters}))};expires=${d.toUTCString()};path=/`;}
+function load(){const m=document.cookie.match(new RegExp('(?:^|; )'+CKEY+'=([^;]*)'));if(!m)return;try{const d=JSON.parse(decodeURIComponent(m[1]));inventory=d.inventory||[];counters=d.counters||counters;}catch{}}
 
-    function init() {
-        Object.keys(INVENTORY).forEach(folder => {
-            INVENTORY[folder].forEach(name => {
-                allGifs.push({ folder: folder, url: `asset/${folder}/${name}` });
-            });
-        });
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STATS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function genStats(rarity,seed){const[mn,mx]=STAT_RANGES[rarity];const r=o=>{const x=Math.sin(seed*9301+o*49297+233720)*10000;return mn+Math.floor((x-Math.floor(x))*(mx-mn+1));};const s={};STATS.forEach((d,i)=>s[d.key]=r(i));return s;}
+function power(stats){return Object.values(stats).reduce((a,b)=>a+b,0);}
+function makeOwl(folder,filename){
+    const seed=[...filename].reduce((a,c,i)=>a+c.charCodeAt(0)*(i+1),0);
+    return{id:Date.now()+Math.random(),folder,filename,url:`asset/${folder}/${filename}`,name:filename.replace(/\.[^.]+$/,'').replace(/[-_()\s]+/g,' ').toUpperCase().trim(),stats:genStats(folder,seed)};
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   INIT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function init(){
+    Object.entries(POOL).forEach(([f,files])=>files.forEach(n=>allGifs.push({folder:f,name:n,url:`asset/${f}/${n}`})));
+    load(); updateCounters(); updateInvBadge();
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ROLL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function rollDrop(){
+    if(isRolling||!allGifs.length)return;
+    isRolling=true;
+    const track=document.getElementById('rouletteTrack');
+    const btn=document.getElementById('btnDrop');
+    const badge=document.getElementById('rarityBadge');
+    const img=document.getElementById('gifImg');
+    const idle=document.getElementById('idleOwl');
+    const ring=document.getElementById('ring');
+
+    btn.classList.add('rolling');
+    track.className='roulette-track spinning';
+    badge.classList.remove('visible');
+    img.style.display='none'; idle.style.display='block';
+    ring.className='ring';
+
+    const pick=allGifs[Math.floor(Math.random()*allGifs.length)];
+    const N=50, WIN=N-8;
+
+    track.style.transition='none'; track.style.transform='translateX(0)'; track.innerHTML='';
+    for(let i=0;i<N;i++){
+        const g=i===WIN?pick:allGifs[Math.floor(Math.random()*allGifs.length)];
+        const d=document.createElement('div');
+        d.className='roulette-item';
+        d.style.setProperty('--item-color',CFG[g.folder].color);
+        d.style.backgroundImage=`url(${g.url})`;
+        if(i===WIN)d.id='winnerItem';
+        track.appendChild(d);
     }
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        // Mesure réelle après rendu : centre de l'item winner → centre du wrapper
+        const winnerEl = document.getElementById('winnerItem');
+        const wrapperEl = document.querySelector('.roulette-wrapper');
+        const winnerRect  = winnerEl.getBoundingClientRect();
+        const wrapperRect = wrapperEl.getBoundingClientRect();
+        const winnerCenter  = winnerRect.left  + winnerRect.width  / 2;
+        const wrapperCenter = wrapperRect.left + wrapperRect.width / 2;
+        const offset = winnerCenter - wrapperCenter;
+        track.style.transition='transform 4.5s cubic-bezier(0.15,0,0.15,1)';
+        track.style.transform=`translateX(-${offset}px)`;
+    }));
 
-    function rollDrop() {
-        if (isRolling || allGifs.length === 0) return;
-        isRolling = true;
+    setTimeout(()=>{
+        track.classList.remove('spinning'); track.classList.add('finished');
+        const we=document.getElementById('winnerItem');
+        const cfg=CFG[pick.folder];
+        we.classList.add('winner'); we.style.setProperty('--drop-glow',cfg.color);
 
-        const track = document.getElementById('rouletteTrack');
-        const btn = document.getElementById('btnDrop');
-        const badge = document.getElementById('rarityBadge');
-        const img = document.getElementById('gifImg');
-        const idle = document.getElementById('idleOwl');
-        const ring = document.getElementById('ring');
+        idle.style.display='none'; img.src=pick.url; img.style.display='block';
+        badge.textContent=cfg.label; badge.style.background=cfg.color; badge.classList.add('visible');
+        ring.className=`ring ${pick.folder}`;
 
-        btn.classList.add('rolling');
-        track.className = 'roulette-track spinning';
-        badge.classList.remove('visible');
-        img.style.display = 'none';
-        idle.style.display = 'block';
-        ring.className = 'ring';
+        const f=document.getElementById('flash'); f.classList.add('fire'); setTimeout(()=>f.classList.remove('fire'),800);
 
-        const pick = allGifs[Math.floor(Math.random() * allGifs.length)];
-        const itemCount = 50;
-        const itemWidth = 120;
-        const winningIndex = itemCount - 8;
+        counters[pick.folder]++; updateCounters();
+        pending=makeOwl(pick.folder,pick.name);
+        save();
 
-        track.style.transition = 'none';
-        track.style.transform = 'translateX(0)';
-        track.innerHTML = '';
+        btn.classList.remove('rolling'); isRolling=false;
+        setTimeout(()=>showResultPopup(pending),550);
+    },4700);
+}
 
-        for (let i = 0; i < itemCount; i++) {
-            const isWin = (i === winningIndex);
-            const gif = isWin ? pick : allGifs[Math.floor(Math.random() * allGifs.length)];
-            const div = document.createElement('div');
-            div.style.setProperty('--item-color', CFG[gif.folder].color);
-            div.style.backgroundImage = `url(${gif.url})`;
-            div.className = `roulette-item ${gif.folder}`;
-            if(isWin) div.id = "winnerItem";
-            track.appendChild(div);
-        }
+function updateCounters(){['ok','rare','epic','legendaire'].forEach(r=>{const e=document.getElementById(`cnt${r[0].toUpperCase()+r.slice(1)}`);if(e)e.textContent=counters[r];});}
+function updateInvBadge(){const e=document.getElementById('invCount');if(e)e.textContent=`${inventory.length}/20`;}
 
-        setTimeout(() => {
-            track.style.transition = 'transform 4.5s cubic-bezier(0.15, 0, 0.15, 1)';
-            const offset = (winningIndex * itemWidth) - (window.innerWidth / 2) + (itemWidth / 2);
-            track.style.transform = `translateX(-${offset}px)`;
-        }, 50);
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   RESULT POPUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function showResultPopup(owl){
+    const slot=document.getElementById('resultCardSlot');
+    slot.innerHTML=''; slot.appendChild(buildCardEl(owl,false));
 
-        setTimeout(() => {
-            track.classList.remove('spinning');
-            track.classList.add('finished');
-            const winItem = document.getElementById('winnerItem');
-            const cfg = CFG[pick.folder];
-            winItem.classList.add('winner');
-            winItem.style.setProperty('--drop-glow', cfg.color);
+    const full=inventory.length>=MAX;
+    const addBtn=document.getElementById('btnAddInv');
+    const banner=document.getElementById('swapBanner');
+    const sg=document.getElementById('swapGrid');
 
-            idle.style.display = 'none';
-            img.src = pick.url;
-            img.style.display = 'block';
-            badge.textContent = cfg.label;
-            badge.style.background = cfg.color;
-            badge.classList.add('visible');
-            ring.className = `ring ${pick.folder}`;
-
-            const f = document.getElementById('flash');
-            f.classList.add('fire');
-            setTimeout(() => f.classList.remove('fire'), 800);
-
-            // Mise à jour des compteurs
-            const idKey = `cnt${pick.folder.charAt(0).toUpperCase() + pick.folder.slice(1)}`;
-            const el = document.getElementById(idKey);
-            if(el) el.textContent = parseInt(el.textContent) + 1;
-
-            btn.classList.remove('rolling');
-            isRolling = false;
-        }, 4700);
+    if(full){
+        addBtn.style.display='none';
+        banner.classList.add('show');
+        sg.style.display='block';
+        buildSwapGrid();
+    } else {
+        addBtn.style.display='';
+        banner.classList.remove('show');
+        sg.style.display='none';
     }
+    document.getElementById('resultPopup').classList.add('show');
+}
 
-    init();
+function buildSwapGrid(){
+    const inner=document.getElementById('swapGridInner');
+    inner.innerHTML='';
+    inventory.forEach((owl,idx)=>{
+        const c=document.createElement('div');
+        c.className='swap-mini-card';
+        c.style.setProperty('--c',CFG[owl.folder].color);
+        c.title=owl.name;
+        c.onclick=()=>swapOwl(idx);
+        const img=document.createElement('img');
+        img.src=owl.url; img.alt=owl.name;
+        c.appendChild(img);
+        const dot=document.createElement('div');
+        dot.className='swap-dot';
+        c.appendChild(dot);
+        inner.appendChild(c);
+    });
+}
+
+function swapOwl(idx){
+    if(!pending)return;
+    const removed=inventory[idx];
+    inventory[idx]=pending;
+    save(); updateInvBadge();
+    toast(`🔄 ${removed.name} → ${pending.name}`,CFG[pending.folder].color);
+    closeResultPopup();
+    if(document.getElementById('view-inventory').classList.contains('active'))renderInventory();
+}
+
+function addToInventory(){
+    if(!pending||inventory.length>=MAX)return;
+    inventory.push(pending); save(); updateInvBadge();
+    toast(`🦉 ${pending.name} ajouté !`,CFG[pending.folder].color);
+    closeResultPopup();
+    if(document.getElementById('view-inventory').classList.contains('active'))renderInventory();
+}
+function closeResultPopup(){document.getElementById('resultPopup').classList.remove('show');document.getElementById('swapBanner').classList.remove('show');pending=null;}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   INVENTORY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function renderInventory(){
+    const grid=document.getElementById('invGrid');
+    grid.innerHTML='';
+    document.getElementById('slotsInfo').textContent=`${inventory.length} / ${MAX} slots`;
+
+    inventory.forEach((owl,idx)=>grid.appendChild(buildMiniCard(owl,idx)));
+
+    for(let i=inventory.length;i<MAX;i++){
+        const el=document.createElement('div');
+        el.className='owl-card empty';
+        el.innerHTML=`<div class="empty-icon">＋</div>`;
+        el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over');});
+        el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+        el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag-over');dropToSlot(i);});
+        grid.appendChild(el);
+    }
+}
+
+function buildMiniCard(owl,idx){
+    const cfg=CFG[owl.folder];
+    const card=document.createElement('div');
+    card.className='owl-card';
+    card.style.setProperty('--card-color',cfg.color);
+    card.draggable=true;
+    card.innerHTML=`
+        <div class="card-stripe"></div>
+        <div class="card-img-wrap"><img src="${owl.url}" alt="${owl.name}" loading="lazy"/></div>
+        <div class="card-footer">
+            <div class="card-name">${owl.name}</div>
+            <div class="mini-bars">${STATS.map(s=>`<div class="mini-bar-track"><div class="mini-bar-fill" style="--w:${Math.round(owl.stats[s.key]/99*100)}%"></div></div>`).join('')}</div>
+        </div>
+        <button class="card-del-btn">✕</button>
+    `;
+    card.querySelector('.card-del-btn').addEventListener('click',e=>{e.stopPropagation();removeOwl(idx);});
+    card.addEventListener('click',()=>openModal(owl,idx));
+    card.addEventListener('dragstart',e=>{dragSrc=idx;card.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+    card.addEventListener('dragend',()=>card.classList.remove('dragging'));
+    card.addEventListener('dragover',e=>{e.preventDefault();card.classList.add('drag-over');});
+    card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+    card.addEventListener('drop',e=>{
+        e.preventDefault(); card.classList.remove('drag-over');
+        if(dragSrc===null||dragSrc===idx)return;
+        [inventory[dragSrc],inventory[idx]]=[inventory[idx],inventory[dragSrc]];
+        dragSrc=null; save(); renderInventory();
+    });
+    return card;
+}
+
+function dropToSlot(targetIdx){
+    if(dragSrc===null)return;
+    const[owl]=inventory.splice(dragSrc,1);
+    inventory.splice(Math.min(targetIdx,inventory.length),0,owl);
+    dragSrc=null; save(); renderInventory();
+}
+
+function removeOwl(idx){
+    const owl=inventory[idx];if(!owl)return;
+    inventory.splice(idx,1); save(); updateInvBadge(); renderInventory();
+    toast(`🦉 ${owl.name} libéré.`,'#ff8888');
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FULL CARD MODAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+let modalIdx=-1;
+function openModal(owl,idx){
+    modalIdx=idx;
+    const fc=document.getElementById('fullCard');
+    const cfg=CFG[owl.folder];
+    fc.style.setProperty('--card-color',cfg.color);
+    fc.innerHTML=buildCardHTML(owl,true);
+    document.getElementById('cardModal').classList.add('show');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        fc.querySelectorAll('.stat-bar-fill[data-w]').forEach(el=>el.style.width=el.dataset.w);
+    }));
+}
+function buildCardEl(owl){
+    const fc=document.createElement('div');
+    fc.className='full-card';
+    fc.style.setProperty('--card-color',CFG[owl.folder].color);
+    fc.innerHTML=buildCardHTML(owl,false);
+    return fc;
+}
+function buildCardHTML(owl,showDel){
+    const cfg=CFG[owl.folder];
+    const stars='✦'.repeat(cfg.stars)+'✧'.repeat(4-cfg.stars);
+    return `
+    <div class="fc-header">
+        <span style="font-family:'Bungee';color:${cfg.color};font-size:0.85rem">${stars}</span>
+        <span class="fc-rarity">${cfg.label}</span>
+        ${showDel?`<button class="modal-close" onclick="closeModalBtn()">✕</button>`:''}
+    </div>
+    <div class="fc-img"><img src="${owl.url}" alt="${owl.name}"/></div>
+    <div class="fc-body">
+        <div class="fc-name">${owl.name}</div>
+        <div class="stats-list">
+            ${STATS.map(s=>`
+            <div class="stat-row">
+                <span class="stat-icon">${s.icon}</span>
+                <span class="stat-label">${s.label}</span>
+                <div class="stat-bar-wrap"><div class="stat-bar-fill" ${showDel?`data-w="${owl.stats[s.key]}%"`:`style="width:${owl.stats[s.key]}%"`}></div></div>
+                <span class="stat-value">${owl.stats[s.key]}</span>
+            </div>`).join('')}
+        </div>
+        <div class="power-total">
+            <div class="power-label">PUISSANCE TOTALE</div>
+            <div class="power-value">${power(owl.stats)}</div>
+        </div>
+        ${showDel?`<button class="fc-del-btn" onclick="removeOwlFromModal()">🗑 LIBÉRER CE HIBOU</button>`:''}
+    </div>`;
+}
+function closeModalOutside(e){if(e.target===document.getElementById('cardModal'))closeModalBtn();}
+function closeModalBtn(){document.getElementById('cardModal').classList.remove('show');modalIdx=-1;}
+function removeOwlFromModal(){const i=modalIdx;closeModalBtn();if(i>=0)removeOwl(i);}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HELPERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function switchView(name,btn){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById(`view-${name}`).classList.add('active');
+    btn.classList.add('active');
+    if(name==='inventory')renderInventory();
+}
+function toast(msg,color='#fff'){
+    const t=document.createElement('div');
+    t.className='toast'; t.style.borderColor=color+'44'; t.style.color=color; t.textContent=msg;
+    document.getElementById('toastContainer').appendChild(t);
+    setTimeout(()=>t.remove(),2900);
+}
+
+init();
 </script>
 </body>
 </html>
